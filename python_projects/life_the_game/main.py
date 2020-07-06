@@ -7,7 +7,7 @@ WAY = os.path.abspath(__file__)[:-7]
 FPS = 50
 
 pygame.init()
-screen = pygame.display.set_mode((800, 500))
+screen = pygame.display.set_mode((800, 550))
 pygame.display.set_caption("The Life")
 clock = pygame.time.Clock()
 
@@ -17,6 +17,10 @@ menu_bg = pygame.image.load(WAY + 'images\\backgrounds\\menu_bg.png')
 running = True
 menu = True
 game = False
+
+create_bacteria = True
+create_plancton = False
+kill = False
 
 time = 0
 
@@ -56,8 +60,34 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     position = event.pos
-                    cls.bacteria = cls.Bacteria(position[0], position[1], 5, 5)
-                    cls.bacterias.add(cls.bacteria)
+                    print(position)
+                    if position[1] >= 500:
+                        if 506 <= position[1] <= 543:
+                            if 6 <= position[0] <= 43:
+                                cls.pbx = 6
+                                create_bacteria = True
+                                create_plancton = False
+                                kill = False
+                            if 50 <= position[0] <= 87:
+                                cls.pbx = 50
+                                create_plancton = True
+                                create_bacteria = False
+                                kill = False
+                            if 94 <= position[0] <= 131:
+                                cls.pbx = 94
+                                kill = True
+                                create_bacteria = False
+                                create_plancton = False
+                    else:
+                        if create_bacteria:
+                            cls.bacteria = cls.Bacteria(position[0], position[1], 5, 5)
+                            cls.bacterias.add(cls.bacteria)
+                        if create_plancton:
+                            cls.plnc = cls.Plancton(position[0], position[1])
+                            cls.planctons.add(cls.plnc)
+                        if kill:
+                            cls.killer = cls.Killer(position[0], position[1])
+                            cls.killerG.add(cls.killer)
         if time >= random.randint(1, 20):
             time = 0
             cls.plnc = cls.Plancton()
@@ -68,6 +98,10 @@ while running:
         cls.bacterias.update()
         cls.zones.draw(screen)
         cls.planctons.draw(screen)
+        cls.game_tools.draw(screen)
+        cls.game_tools.update()
+
+        cls.killerG.update()
 
         pygame.display.flip()
 pygame.quit()
