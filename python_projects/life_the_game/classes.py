@@ -17,6 +17,7 @@ playBtnAct_img = pygame.image.load(os.path.join(img_folder, 'btns\\play_btn-act.
 exitBtnAct_img = pygame.image.load(os.path.join(img_folder, 'btns\\exit_btn-act.png')).convert()
 bacteria_img = pygame.image.load(os.path.join(img_folder, 'bacteria.png'))
 plancton_img = pygame.image.load(os.path.join(img_folder, 'plancton.png'))
+zone_img = pygame.image.load(os.path.join(img_folder, 'zone-debug.png'))
 
 
 class Button(pygame.sprite.Sprite):
@@ -37,27 +38,27 @@ class Bacteria(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.hunger = 1
-        self.time_to_eat = 20
+        self.time_to_eat = 60
+        self.zone = EatZone()
+        zones.add(self.zone)
 
     def update(self):
+
+        self.zone.rect.x = self.rect.x - 10
+        self.zone.rect.y = self.rect.y - 10
+
         self.time_to_eat -= 0.02
         if self.time_to_eat <= 0:
             self.hunger -= 1
         if self.hunger <= 0:
+            self.zone.kill()
             self.kill()
-        if self.hunger >= 2:
+        if self.hunger >= 3:
             bacteria2 = Bacteria(self.rect.x + 50, self.rect.y, 5, 5)
             bacterias.add(bacteria2)
             self.hunger -= 1
-        radius_x1 = self.rect.x + 53
-        radius_x2 = self.rect.x - 10
-        radius_y1 = self.rect.y + 48
-        radius_y2 = self.rect.y - 10
 
-        if radius_x1 >= plnc.rect.x + 18 or\
-            radius_x2 <= plnc.rect.x or\
-            radius_y1 >= plnc.rect.y + 35 or\
-            radius_y2 <= plnc.rect.y:
+        if pygame.sprite.spritecollide(self.zone, planctons, True):
             if plnc.rect.x > self.rect.x:
                 self.rect.x += 8
             if plnc.rect.x < self.rect.x:
@@ -68,6 +69,7 @@ class Bacteria(pygame.sprite.Sprite):
                 self.rect.y -= 8
 
         else:
+            print(self.hunger)
             self.rect.x += self.dx
             self.rect.y += self.dy
             if random.randint(0, 10) > 7:
@@ -89,8 +91,8 @@ class Plancton(pygame.sprite.Sprite):
         self.rect.x = self.rect.x = random.randint(0, 765)
         self.rect.y = self.rect.y = random.randint(0, 482)
     def update(self):
-        if pygame.sprite.spritecollide(self, bacterias, True):
-            self.kill()
+        #if pygame.sprite.spritecollide(self, bacterias, True):
+        #    self.kill()
         r = random.randint(0, 3)
         r2 = random.randint(0, 3)
         if r == 0:
@@ -114,6 +116,14 @@ class Plancton(pygame.sprite.Sprite):
             plnc = Plancton()
             planctons.add(plnc)
 
+class EatZone(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = zone_img
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+
 
 menu_buttons = pygame.sprite.Group()
 start_btn = Button(150, 180, playBtn_img)
@@ -122,6 +132,7 @@ menu_buttons.add(start_btn, exit_btn)
 
 bacterias = pygame.sprite.Group()
 planctons = pygame.sprite.Group()
+zones = pygame.sprite.Group()
 plnc = Plancton()
 
 pygame.quit()
