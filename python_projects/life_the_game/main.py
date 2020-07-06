@@ -63,10 +63,11 @@ while running:
             cls.plnc = cls.Plancton()
             cls.planctons.add(cls.plnc)
 
+        cls.planctons.update()
         cls.bacterias.draw(screen)
         cls.bacterias.update()
+        cls.zones.draw(screen)
         cls.planctons.draw(screen)
-        cls.planctons.update()
 
         pygame.display.flip()
 pygame.quit()
